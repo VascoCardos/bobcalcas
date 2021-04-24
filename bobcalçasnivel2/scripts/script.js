@@ -28,6 +28,7 @@ var gameover = false;
 function preload ()
 {
     cursors = this.input.keyboard.createCursorKeys();
+    this.load.image('background', 'assets/background.png');
     this.load.image('sky', 'assets/sky.png');
     this.load.image('ground', 'assets/ground.png');
     this.load.image('star', 'assets/star.png');
@@ -42,6 +43,7 @@ function preload ()
 
 function create ()
 {
+    let bg = this.add.image(0,0,'background');
     this.add.image(400, 300, 'sky');
     platforms = this.physics.add.staticGroup();
     spaceships = this.physics.add.staticGroup();
@@ -106,6 +108,9 @@ function create ()
     this.physics.add.collider(stars, platforms);
     this.physics.add.overlap(player, stars, collectStar, null, this);
     scoreText = this.add.text(16, 16, 'score: 0', {fontSize: '32px', fill: '#000' });
+
+    this.camera.main.setbounds(0,0,bg.displayWidth,bg.displayHeight);
+    this.camera.main.startFollow(player);
 
     bombs = this.physics.add.group();
     this.physics.add.collider(bombs, platforms);
