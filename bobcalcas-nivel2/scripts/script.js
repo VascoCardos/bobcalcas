@@ -49,9 +49,10 @@ function preload ()
     this.load.image('turret', 'assets/turretShip.png');
     this.load.image('turret_r', 'assets/turretShip_r.png');
     this.load.image('mothership', 'assets/mothership.png');
-    this.load.image('mscollider1', 'assets/mscollider1.png');
-    this.load.image('mscollider2', 'assets/mscollider2.png');
-    this.load.image('mscollider3', 'assets/mscollider3.png');
+    this.load.image('mscollider1', 'assets/msCollider1.png');
+    this.load.image('mscollider2', 'assets/msCollider2.png');
+    this.load.image('mscollider3', 'assets/msCollider3.png');
+    this.load.image('platship', 'assets/platship.png');
     this.load.spritesheet('bob',
         'assets/BobCinto.png',
         { frameWidth: 65, frameHeight: 130 }
@@ -64,7 +65,7 @@ function preload ()
 function create ()
 {
     let bg = this.add.image(0,0,'background').setOrigin(0,0);
-    let mother_bg = this.add.image(750, 200, 'mothership');
+    let mother_bg = this.add.image(750, 150, 'mothership');
     this.cameras.main.setBounds(0, 0, bg.displayWidth, bg.displayHeight);
     platforms = this.physics.add.staticGroup();
     deathPlatforms = this.physics.add.staticGroup();
@@ -73,7 +74,7 @@ function create ()
     platforms.create(1498, 1200, 'invwall');
     platforms.create(750, 2380, 'colliderGround').setScale(2).refreshBody();
 
-    
+
 
 
 
@@ -119,8 +120,8 @@ function create ()
     spaceships.create(1000, 780, 'smallShip');
     platforms.create(1000, 780, 'smallCollider');
 
-    spaceships.create(750, 605, 'smallShip');
-    platforms.create(750, 605, 'smallCollider');
+    /*spaceships.create(750, 605, 'smallShip');
+    platforms.create(750, 605, 'smallCollider');*/
 
     spaceships.create(500, 430, 'smallShip');
     platforms.create(500, 430, 'smallCollider');
@@ -128,6 +129,12 @@ function create ()
     spaceships.create(1000, 430, 'smallShip');
     platforms.create(1000, 430, 'smallCollider');
 
+    platforms.create(630, 250, 'mscollider2');
+    platforms.create(870, 250, 'mscollider2');
+    platforms.create(750, 170, 'mscollider3');
+    platforms.create(750, 170, 'platship');
+    platforms.create(595, 140, 'mscollider1');
+    platforms.create(905, 140, 'mscollider1');
 
     var ship = this.physics.add.image(75, 1400, 'smallCollider')
         .setImmovable(true)
@@ -158,6 +165,16 @@ function create ()
         .setImmovable(true)
         .setVelocity(0,0);
     shipImage3.body.setAllowGravity(false);
+
+    var ship4 = this.physics.add.image(750, 780, 'smallCollider')
+        .setImmovable(true)
+        .setVelocity(0,0);
+    ship4.body.setAllowGravity(false);
+
+    var shipImage4 = this.physics.add.image(750, 780, 'smallShip')
+        .setImmovable(true)
+        .setVelocity(0,0);
+    shipImage4.body.setAllowGravity(false);
 
     spaceships.create(75, 680, 'turret');
     deathPlatforms.create(75,680, 'smallCollider');
@@ -194,6 +211,7 @@ function create ()
     this.physics.add.collider(player, ship);
     this.physics.add.collider(player, ship2);
     this.physics.add.collider(player, ship3);
+    this.physics.add.collider(player, ship4);
     var cursors = this.input.keyboard.createCursorKeys();
     if (cursors.left.isDown)
     {
@@ -268,6 +286,25 @@ function create ()
             { x:    -150, y: 0, duration: 9000, ease: 'Stepped' }
         ]
     });
+
+    this.tweens.timeline({
+        targets: ship4.body.velocity,
+        loop: -1,
+        tweens: [
+            { x:   0 , y: -50, duration: 8000, ease: 'Stepped' },
+            { x:    0, y: 50, duration: 8000, ease: 'Stepped' }
+        ]
+    });
+
+    this.tweens.timeline({
+        targets: shipImage4.body.velocity,
+        loop: -1,
+        tweens: [
+            { x:    0, y: -50, duration: 8000, ease: 'Stepped' },
+            { x:    0, y: 50, duration: 8000, ease: 'Stepped' }
+        ]
+    });
+
 
 
 
