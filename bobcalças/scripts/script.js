@@ -6,7 +6,7 @@ var config = {
         default: 'arcade',
         arcade: {
             gravity: { y: 300 },
-            debug: false
+            debug: true
         }
     },
     scene: {
@@ -24,8 +24,10 @@ var spaceships;
 var player;
 var gameover = false;
 var timedEvent;
+var timedEvent2;
 var projectiles;
 var pew;
+var pew3;
 var death;
 
 function preload ()
@@ -46,24 +48,34 @@ function preload ()
     this.load.image('invwall', 'assets/invwall.png');
     this.load.image('turret', 'assets/turretShip.png');
     this.load.image('turret_r', 'assets/turretShip_r.png');
+    this.load.image('mothership', 'assets/mothership.png');
+    this.load.image('mscollider1', 'assets/mscollider1.png');
+    this.load.image('mscollider2', 'assets/mscollider2.png');
+    this.load.image('mscollider3', 'assets/mscollider3.png');
     this.load.spritesheet('bob',
         'assets/BobCinto.png',
         { frameWidth: 65, frameHeight: 130 }
     );
     this.load.audio('pew', 'assets/pew.mp3');
+    this.load.audio('pew3x', 'assets/pew3.mp3');
     this.load.audio('death', 'assets/deathSound.mp3');
 }
 
 function create ()
 {
     let bg = this.add.image(0,0,'background').setOrigin(0,0);
+    let mother_bg = this.add.image(750, 200, 'mothership');
     this.cameras.main.setBounds(0, 0, bg.displayWidth, bg.displayHeight);
     platforms = this.physics.add.staticGroup();
     deathPlatforms = this.physics.add.staticGroup();
     spaceships = this.physics.add.staticGroup();
-    platforms.create(1, 1200, 'invwall');
-    platforms.create(1499, 1200, 'invwall');
+    platforms.create(2, 1200, 'invwall');
+    platforms.create(1498, 1200, 'invwall');
     platforms.create(750, 2380, 'colliderGround').setScale(2).refreshBody();
+
+    
+
+
 
     spaceships.create(600, 2190, 'alienship');
     platforms.create(600, 2190, 'collider');
@@ -107,8 +119,14 @@ function create ()
     spaceships.create(1000, 780, 'smallShip');
     platforms.create(1000, 780, 'smallCollider');
 
-    spaceships.create(750, 600, 'smallShip');
-    platforms.create(750, 600, 'smallCollider');
+    spaceships.create(750, 605, 'smallShip');
+    platforms.create(750, 605, 'smallCollider');
+
+    spaceships.create(500, 430, 'smallShip');
+    platforms.create(500, 430, 'smallCollider');
+
+    spaceships.create(1000, 430, 'smallShip');
+    platforms.create(1000, 430, 'smallCollider');
 
 
     var ship = this.physics.add.image(75, 1400, 'smallCollider')
@@ -142,13 +160,14 @@ function create ()
     shipImage3.body.setAllowGravity(false);
 
     spaceships.create(75, 680, 'turret');
-    deathPlatforms.create(75,680, 'collider');
+    deathPlatforms.create(75,680, 'smallCollider');
 
-    spaceships.create(1425, 480, 'turret_r');
-    deathPlatforms.create(1425,480, 'collider');
+    spaceships.create(1425, 500, 'turret_r');
+    deathPlatforms.create(1425,500, 'smallCollider');
 
-    pew=this.sound.add('pew', {volume: 0.25});
-    death = this.sound.add('death');
+    pew=this.sound.add('pew', {volume: 0.1});
+    death = this.sound.add('death', {volume: 0.2});
+    pew3= this.sound.add('pew3x', {volume: 0.2});
 
     player=this.physics.add.sprite(750,900, 'bob');
     player.setBounce(0.05);
@@ -263,6 +282,7 @@ function create ()
     this.physics.add.collider(player, deathPlatforms, hitProjectile, null, this);
 
     timedEvent = this.time.addEvent({ delay: 1000, callback: openLaser, callbackScope: this, loop: true });
+    timedEvent2 = this.time.addEvent({ delay: 500, callback: turretFire, callbackScope: this, loop: true });
 
 
 
@@ -337,19 +357,21 @@ function openLaser(){
 }
 
 function turretFire(){
-    var proj = projectiles.create(600, 1620,'turretLaser');
-    proj.setVelocity(0,300);
-    var proj = projectiles.create(600, 1620,'turretLaser');
-    proj.setVelocity(0,300);
-    var proj = projectiles.create(600, 1620,'turretLaser');
-    proj.setVelocity(0,300);
-    var proj = projectiles.create(600, 1620,'turretLaser');
-    proj.setVelocity(0,300);
-    var proj = projectiles.create(600, 1620,'turretLaser');
-    proj.setVelocity(0,300);
-    var proj = projectiles.create(600, 1620,'turretLaser');
+    var proj = projectiles.create(95, 650,'turretLaser');
+    proj.setVelocity(3000,0);
+    var proj = projectiles.create(115, 650,'turretLaser');
+    proj.setVelocity(3000,0);
+    var proj = projectiles.create(135, 650,'turretLaser');
+    proj.setVelocity(3000,0);
 
-    proj.setVelocity(0,300);
+    var proj = projectiles.create(1425, 470,'turretLaser');
+    proj.setVelocity(-3000,0);
+    var proj = projectiles.create(1405, 470,'turretLaser');
+    proj.setVelocity(-3000,0);
+    var proj = projectiles.create(1385, 470,'turretLaser');
+    proj.setVelocity(-3000,0);
+
+    pew3.play();
 }
 
 
