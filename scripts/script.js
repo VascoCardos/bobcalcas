@@ -53,6 +53,7 @@ var nave2;
 var death;
 var pew;
 var pew3;
+var portal;
 
 
 
@@ -79,19 +80,16 @@ class menu extends Phaser.Scene{
         this.button4 = this.add.sprite(1080, 600, 'button4').setScale(0.5).setInteractive();
         this.button1.on('pointerdown', function(){
             this.scene.start("Nivel1");
-        });
+        },this);
         this.button2.on('pointerdown', function(){
             this.scene.start("Nivel2");
-        });
+        },this);
         /*this.button3.on('pointerup', function(){
             this.scene.start("SelectMenu");
         });
         this.button4.on('pointerup', function(){
             this.scene.start("SelectMenu");
         });*/
-    }
-    update(){
-
     }
 }
 
@@ -149,10 +147,6 @@ class nivel1 extends Phaser.Scene{
     }
 
     create(){
-
-
-
-
         let bg = this.add.image(0, 0, "sky").setOrigin(0, 0).setScale(1);
 
         this.cameras.main.setBounds(0, 0, bg.displayWidth, bg.displayHeight);
@@ -178,12 +172,12 @@ class nivel1 extends Phaser.Scene{
 
         predio.create(4700,375, "predio").setScale(0.85);
 
-        // Posição inicial: 300/600
-        // 1 obstaculo:2300/200
-        // 2 obstaculo: 5200/600
-        // final : 6300/600
+        // Posição inicial: 300,600
+        // 1 obstaculo:2300,200
+        // 2 obstaculo: 5200,600
+        // final : 6300,600
 
-        player1 = this.physics.add.sprite(300, 600, 'bob').setScale(0.75);
+        player1 = this.physics.add.sprite(6000,600, 'bob').setScale(0.75);
 
         death = this.sound.add('death');
 
@@ -327,6 +321,7 @@ class nivel1 extends Phaser.Scene{
         this.physics.add.collider(Alien2,platforms);
         this.physics.add.collider(Alien2,player1);
         this.physics.add.collider(player1,elevador);
+        this.physics.add.collider(player1, santuario,this.nextlevel,null,this);
 
 
 
@@ -449,6 +444,7 @@ class nivel1 extends Phaser.Scene{
 
         cursors = this.input.keyboard.createCursorKeys();
 
+        this.input.keyboard.on('keydown_M', this.goToMenu, this);
 
     }
 
@@ -509,9 +505,13 @@ class nivel1 extends Phaser.Scene{
     }
 
 
+    nextlevel(){
+        this.scene.start("Nivel2");
+    }
 
-
-
+    goToMenu(){
+        this.scene.start("Menu");
+    }
 
     openLaser(){
         var proj = projectiles.create(2900, 665,'laser');
@@ -631,6 +631,7 @@ class nivel2 extends Phaser.Scene{
         this.load.image('mscollider2', 'assets/msCollider2.png');
         this.load.image('mscollider3', 'assets/msCollider3.png');
         this.load.image('platship', 'assets/platship.png');
+        this.load.image('portal', 'assets/portal.png');
         this.load.spritesheet('bob',
             'assets/BobCinto.png',
             { frameWidth: 65, frameHeight: 130 }
@@ -644,6 +645,8 @@ class nivel2 extends Phaser.Scene{
     {
         let bg = this.add.image(0,0,'background').setOrigin(0,0);
         let mother_bg = this.add.image(750, 150, 'mothership');
+        portal = this.physics.add.staticGroup();
+        portal.create(750, 100, 'portal');
         this.cameras.main.setBounds(0, 0, bg.displayWidth, bg.displayHeight);
         platforms = this.physics.add.staticGroup();
         deathPlatforms = this.physics.add.staticGroup();
@@ -651,10 +654,6 @@ class nivel2 extends Phaser.Scene{
         platforms.create(2, 1200, 'invwall');
         platforms.create(1498, 1200, 'invwall');
         platforms.create(750, 2380, 'colliderGround').setScale(2).refreshBody();
-
-
-
-
 
         spaceships.create(600, 2190, 'alienship');
         platforms.create(600, 2190, 'collider');
@@ -771,7 +770,7 @@ class nivel2 extends Phaser.Scene{
         death = this.sound.add('death', {volume: 0.2});
         pew3= this.sound.add('pew3x', {volume: 0.2});
 
-        player=this.physics.add.sprite(300,2300, 'bob');    //inicial:300,2300 "checkpoint":750,900
+        player=this.physics.add.sprite(750,900, 'bob');    //inicial:300,2300 "checkpoint":750,900
         player.setBounce(0.05);
         player.scale=0.5;
 
@@ -919,13 +918,14 @@ class nivel2 extends Phaser.Scene{
 
         projectiles = this.physics.add.group();
         this.physics.add.overlap(projectiles, platforms,this.removeLaser,null,this);
+        this.physics.add.overlap(portal, player,this.nextLevel,null,this);
         this.physics.add.collider(player, projectiles, this.hitProjectile, null, this);
         this.physics.add.collider(player, deathPlatforms, this.hitProjectile, null, this);
 
         timedEvent2 = this.time.addEvent({ delay: 1000, callback: this.openLaser, callbackScope: this, loop: true });
         timedEvent3 = this.time.addEvent({ delay: 1500, callback: this.turretFire, callbackScope: this, loop: true });
 
-
+        this.input.keyboard.on('keydown_M', this.goToMenu, this);
 
     }
 
@@ -953,6 +953,13 @@ class nivel2 extends Phaser.Scene{
         }
     }
 
+    goToMenu(){
+        this.scene.start("Menu");
+    }
+
+    nextLevel(){
+        this.scene.start("Menu");
+    }
 
     hitProjectile (player, projectile)
     {
