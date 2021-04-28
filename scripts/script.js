@@ -17,7 +17,8 @@ window.onload = function(){
     scene: [
             menu,
             nivel1,
-            nivel2
+            nivel2,
+            creditos
         ]
     }
     var game = new Phaser.Game(config);
@@ -46,7 +47,7 @@ var timedEvent;
 var timedEvent2;
 var timedEvent3;
 var elevador;
-var santuario;
+var altar;
 var predio;
 var nave;
 var nave2;
@@ -57,7 +58,57 @@ var portal;
 
 
 
+class creditos extends Phaser.Scene{
+    constructor(){
+        super("Creditos")
+    }
 
+    preload(){
+        this.load.audio('musica', 'assets/Musica_Menu.mp3')
+        this.load.audio('click', 'assets/click.mp3')
+        this.load.image('creditos', 'assets/creditos.png');
+        this.load.image('barreira', 'assets/barreira.png');
+
+
+    }
+
+    create(){
+
+        let barreira2 = this.physics.add.staticGroup();
+        
+
+        barreira2.create(100, 4000, 'barreira').setScale(2).setImmovable(true);
+
+
+        let bg = this.add.image(0,0,'creditos').setOrigin(0,0);
+
+        this.cameras.main.setBounds(0, 0, bg.displayWidth, bg.displayHeight);
+
+        barreira = this.physics.add.image(100, 100, 'barreira').setScale(0.2).setImmovable(true);
+
+        this.cameras.main.startFollow(barreira);
+
+        this.tweens.timeline({
+            targets: barreira.body.velocity,
+            loop: -1,
+            tweens: [
+                { x:   0 , y: 100, duration: 50000, ease: 'Stepped' },
+                
+            ]
+        });
+
+        
+    this.physics.add.collider(barreira, barreira2, this.menu, null, this);
+    }
+
+        
+
+    menu(){
+
+        this.scene.start("Menu");
+    }
+
+}
 
 class menu extends Phaser.Scene{
     constructor() {
@@ -68,30 +119,46 @@ class menu extends Phaser.Scene{
         this.load.image('menu', 'assets/mainmenu.png');
         this.load.image('button1', 'assets/button1.png');
         this.load.image('button2', 'assets/button2.png');
-        this.load.image('button3', 'assets/button3.png');
+        //this.load.image('button3', 'assets/button3.png');
         this.load.image('button4', 'assets/button4.png');
+        this.load.audio('musica', 'assets/Musica_Menu.mp3')
+        this.load.audio('click', 'assets/click.mp3')
+        
     }
 
     create(){
+
+        
+        this.sound.play('musica', {loop : true, volume : 0.02});
+        
+
         let bg = this.add.image(0,0,'menu').setOrigin(0,0);
-        this.button1 = this.add.sprite(420, 600, 'button1').setScale(0.5).setInteractive();
-        this.button2 = this.add.sprite(640, 600, 'button2').setScale(0.5).setInteractive();
-        this.button3 = this.add.sprite(860, 600, 'button3').setScale(0.5).setInteractive();
-        this.button4 = this.add.sprite(1080, 600, 'button4').setScale(0.5).setInteractive();
+        this.button1 = this.add.sprite(520, 600, 'button1').setScale(0.5).setInteractive();
+        this.button2 = this.add.sprite(750, 600, 'button2').setScale(0.5).setInteractive();
+        //this.button3 = this.add.sprite(860, 600, 'button3').setScale(0.5).setInteractive();
+        this.button4 = this.add.sprite(980, 600, 'button4').setScale(0.5).setInteractive();
         this.button1.on('pointerdown', function(){
+            var pew = this.sound.play('click', {loop : false});
             this.scene.start("Nivel1");
         },this);
         this.button2.on('pointerdown', function(){
+            var pew = this.sound.play('click', {loop : false});
             this.scene.start("Nivel2");
         },this);
         /*this.button3.on('pointerup', function(){
-            this.scene.start("SelectMenu");
-        });
-        this.button4.on('pointerup', function(){
+            var pew = this.sound.play('click', {loop : false});
             this.scene.start("SelectMenu");
         });*/
+        this.button4.on('pointerdown', function(){
+            var pew = this.sound.play('click', {loop : false});
+            
+            this.scene.start("Creditos");
+        },this);
+
     }
+    
 }
+
 
 
 class nivel1 extends Phaser.Scene{
@@ -135,9 +202,9 @@ class nivel1 extends Phaser.Scene{
             { frameWidth: 62, frameHeight: 30 }
         );
 
-        this.load.spritesheet('santuario',
-            'assets/Santuario.png',
-            { frameWidth: 170.65, frameHeight: 348 }
+        this.load.spritesheet('altar',
+            'assets/Altar_com_cinto.png',
+            { frameWidth: 35, frameHeight: 67 }
         );
 
         this.load.audio('death', 'assets/deathSound.mp3');
@@ -161,7 +228,7 @@ class nivel1 extends Phaser.Scene{
         barreira = this.physics.add.staticGroup()
         Alien2 = this.physics.add.staticGroup();
         predio = this.physics.add.staticGroup();
-        santuario = this.physics.add.staticGroup();
+        altar = this.physics.add.staticGroup();
 
 
 
@@ -177,7 +244,7 @@ class nivel1 extends Phaser.Scene{
         // 2 obstaculo: 5200,600
         // final : 6300,600
 
-        player1 = this.physics.add.sprite(6000,600, 'bob').setScale(0.75);
+        player1 = this.physics.add.sprite(6200,600, 'bob').setScale(0.75);
 
         death = this.sound.add('death');
 
@@ -292,7 +359,7 @@ class nivel1 extends Phaser.Scene{
         this.anims.create({
             delay: 1000,
             key: 'santuarioanim',
-            frames: this.anims.generateFrameNumbers('santuario', { start: 0, end: 2 }),
+            frames: this.anims.generateFrameNumbers('altar', { start: 0, end: 2 }),
             frameRate: 5,
             repeat: -1,
 
@@ -302,7 +369,7 @@ class nivel1 extends Phaser.Scene{
         player1.setBounce(0.2);
 
         Alien1.create(2900,655, 'alien').anims.play('Alienleft', true);
-        santuario.create(6300,655, 'santuario').setScale(0.3).anims.play('santuarioanim', true);
+        altar.create(6300,640, 'altar').setScale(2).anims.play('santuarioanim', true);
         Alien2.create(3100,655, 'alien').anims.play('Alienright', true);
         Alien2.create(4580,470, 'alien').anims.play('Alienright', true);
         Alien2.create(4500,85, 'alien').anims.play('Alienright', true);
@@ -321,7 +388,7 @@ class nivel1 extends Phaser.Scene{
         this.physics.add.collider(Alien2,platforms);
         this.physics.add.collider(Alien2,player1);
         this.physics.add.collider(player1,elevador);
-        this.physics.add.collider(player1, santuario,this.nextlevel,null,this);
+        this.physics.add.collider(player1, altar,this.nextlevel,null,this);
 
 
 
@@ -475,6 +542,9 @@ class nivel1 extends Phaser.Scene{
             player1.setVelocityY(-330);
         }
 
+
+
+
         if(lesma1.body.velocity.x > 0){
             lesma1.anims.play('lesmaright', true)
         } else {
@@ -611,11 +681,9 @@ class nivel2 extends Phaser.Scene{
     preload ()
     {
         cursors = this.input.keyboard.createCursorKeys();
-        this.load.image('background', 'assets/background.png');
+        this.load.image('background', 'assets/Background2.png');
         this.load.image('sky', 'assets/sky.png');
         this.load.image('ground', 'assets/ground.png');
-        this.load.image('star', 'assets/star.png');
-        this.load.image('bomb', 'assets/bomb.png');
         this.load.image('alienship','assets/spaceship2.png');
         this.load.image('collider', 'assets/collider.png');
         this.load.image('colliderGround', 'assets/colliderGround.png');
@@ -631,10 +699,14 @@ class nivel2 extends Phaser.Scene{
         this.load.image('mscollider2', 'assets/msCollider2.png');
         this.load.image('mscollider3', 'assets/msCollider3.png');
         this.load.image('platship', 'assets/platship.png');
-        this.load.image('portal', 'assets/portal.png');
         this.load.spritesheet('bob',
             'assets/BobCinto.png',
             { frameWidth: 65, frameHeight: 130 }
+        );
+
+        this.load.spritesheet('altar',
+            'assets/altar_com_adagas.png',
+            { frameWidth: 35, frameHeight: 67 }
         );
         this.load.audio('pew', 'assets/pew.mp3');
         this.load.audio('pew3x', 'assets/pew3.mp3');
@@ -645,8 +717,7 @@ class nivel2 extends Phaser.Scene{
     {
         let bg = this.add.image(0,0,'background').setOrigin(0,0);
         let mother_bg = this.add.image(750, 150, 'mothership');
-        portal = this.physics.add.staticGroup();
-        portal.create(750, 100, 'portal');
+        
         this.cameras.main.setBounds(0, 0, bg.displayWidth, bg.displayHeight);
         platforms = this.physics.add.staticGroup();
         deathPlatforms = this.physics.add.staticGroup();
@@ -688,20 +759,20 @@ class nivel2 extends Phaser.Scene{
         spaceships.create(1300, 950, 'alienship');
         platforms.create(1300, 950, 'collider');
 
-        spaceships.create(500, 780, 'smallShip');
+        /*spaceships.create(500, 780, 'smallShip');
         platforms.create(500, 780, 'smallCollider');
 
         spaceships.create(1000, 780, 'smallShip');
         platforms.create(1000, 780, 'smallCollider');
 
-        /*spaceships.create(750, 605, 'smallShip');
-        platforms.create(750, 605, 'smallCollider');*/
+        spaceships.create(750, 605, 'smallShip');
+        platforms.create(750, 605, 'smallCollider');
 
         spaceships.create(500, 430, 'smallShip');
         platforms.create(500, 430, 'smallCollider');
 
         spaceships.create(1000, 430, 'smallShip');
-        platforms.create(1000, 430, 'smallCollider');
+        platforms.create(1000, 430, 'smallCollider');*/
 
         platforms.create(630, 250, 'mscollider2');
         platforms.create(870, 250, 'mscollider2');
@@ -740,12 +811,12 @@ class nivel2 extends Phaser.Scene{
             .setVelocity(0,0);
         shipImage3.body.setAllowGravity(false);
 
-        var ship4 = this.physics.add.image(750, 780, 'smallCollider')
+        var ship4 = this.physics.add.image(1150, 370, 'smallCollider')
             .setImmovable(true)
             .setVelocity(0,0);
         ship4.body.setAllowGravity(false);
 
-        var shipImage4 = this.physics.add.image(750, 780, 'smallShip')
+        var shipImage4 = this.physics.add.image(1150, 370, 'smallShip')
             .setImmovable(true)
             .setVelocity(0,0);
         shipImage4.body.setAllowGravity(false);
@@ -759,6 +830,7 @@ class nivel2 extends Phaser.Scene{
             .setImmovable(true)
             .setVelocity(0,0);
         shipImage5.body.setAllowGravity(false);
+
 
         spaceships.create(75, 680, 'turret');
         deathPlatforms.create(75,680, 'smallCollider');
@@ -791,12 +863,20 @@ class nivel2 extends Phaser.Scene{
             frameRate: 10,
             repeat: -1
         });
+
+        this.anims.create({
+            key: 'altarmove',
+            frames: this.anims.generateFrameNumbers('altar', { start: 0, end: 1 }),
+            frameRate: 10,
+            repeat: -1
+        });
         this.physics.add.collider(player, platforms);
         this.physics.add.collider(player, ship);
         this.physics.add.collider(player, ship2);
         this.physics.add.collider(player, ship3);
         this.physics.add.collider(player, ship4);
         this.physics.add.collider(player, ship5);
+
         var cursors = this.input.keyboard.createCursorKeys();
         if (cursors.left.isDown)
         {
@@ -876,8 +956,10 @@ class nivel2 extends Phaser.Scene{
             targets: ship4.body.velocity,
             loop: -1,
             tweens: [
-                { x:   0 , y: -50, duration: 8000, ease: 'Stepped' },
-                { x:    0, y: 50, duration: 8000, ease: 'Stepped' }
+                { x:   -260 , y: 0, duration: 3000, ease: 'Stepped' },
+                { x:   0 , y: 85, duration: 5000, ease: 'Stepped' },
+                { x:    260, y: 0, duration: 3000, ease: 'Stepped' },
+                { x:   0 , y: -85, duration: 5000, ease: 'Stepped' }
             ]
         });
 
@@ -885,8 +967,10 @@ class nivel2 extends Phaser.Scene{
             targets: shipImage4.body.velocity,
             loop: -1,
             tweens: [
-                { x:    0, y: -50, duration: 8000, ease: 'Stepped' },
-                { x:    0, y: 50, duration: 8000, ease: 'Stepped' }
+                { x:   -260 , y: 0, duration: 3000, ease: 'Stepped' },
+                { x:   0 , y: 85, duration: 5000, ease: 'Stepped' },
+                { x:    260, y: 0, duration: 3000, ease: 'Stepped' },
+                { x:   0 , y: -85, duration: 5000, ease: 'Stepped' }
             ]
         });
 
@@ -909,6 +993,9 @@ class nivel2 extends Phaser.Scene{
         });
 
 
+        portal = this.physics.add.staticGroup();
+        portal.create(750, 100, 'altar').setScale(2).anims.play('altarmove', true);
+        
 
 
 
@@ -920,10 +1007,11 @@ class nivel2 extends Phaser.Scene{
         this.physics.add.overlap(projectiles, platforms,this.removeLaser,null,this);
         this.physics.add.overlap(portal, player,this.nextLevel,null,this);
         this.physics.add.collider(player, projectiles, this.hitProjectile, null, this);
+        //this.physics.add.collider(ship4, projectiles, this.removeLaser, null, this);
         this.physics.add.collider(player, deathPlatforms, this.hitProjectile, null, this);
 
-        timedEvent2 = this.time.addEvent({ delay: 1000, callback: this.openLaser, callbackScope: this, loop: true });
-        timedEvent3 = this.time.addEvent({ delay: 1500, callback: this.turretFire, callbackScope: this, loop: true });
+        timedEvent2 = this.time.addEvent({ delay: 650, callback: this.openLaser, callbackScope: this, loop: true });
+        timedEvent3 = this.time.addEvent({ delay: 750, callback: this.turretFire, callbackScope: this, loop: true });
 
         this.input.keyboard.on('keydown_M', this.goToMenu, this);
 
@@ -1005,25 +1093,25 @@ class nivel2 extends Phaser.Scene{
     }
 
     turretFire(){
-        var proj = projectiles.create(95, 650,'turretLaser');
+        var proj = projectiles.create(110, 650,'turretLaser');
         proj.body.setAllowGravity(false);
-        proj.setVelocity(500,0);
-        var proj = projectiles.create(125, 650,'turretLaser');
+        proj.setVelocity(900,0);
+        var proj = projectiles.create(140, 650,'turretLaser');
         proj.body.setAllowGravity(false);
-        proj.setVelocity(500,0);
-        var proj = projectiles.create(155, 650,'turretLaser');
+        proj.setVelocity(900,0);
+        var proj = projectiles.create(170, 650,'turretLaser');
         proj.body.setAllowGravity(false);
-        proj.setVelocity(500,0);
+        proj.setVelocity(900,0);
 
-        var proj = projectiles.create(1425, 470,'turretLaser');
+        var proj = projectiles.create(1400, 470,'turretLaser');
         proj.body.setAllowGravity(false);
-        proj.setVelocity(-500,0);
-        var proj = projectiles.create(1405, 470,'turretLaser');
+        proj.setVelocity(-900,0);
+        var proj = projectiles.create(1370, 470,'turretLaser');
         proj.body.setAllowGravity(false);
-        proj.setVelocity(-500,0);
-        var proj = projectiles.create(1385, 470,'turretLaser');
+        proj.setVelocity(-900,0);
+        var proj = projectiles.create(1340, 470,'turretLaser');
         proj.body.setAllowGravity(false);
-        proj.setVelocity(-500,0);
+        proj.setVelocity(-900,0);
 
         pew3.play();
     }
